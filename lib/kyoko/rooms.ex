@@ -58,9 +58,11 @@ defmodule Kyoko.Rooms do
 
   """
   def create_room(attrs \\ %{}) do
-    %Room{}
+    {:ok, room} = %Room{}
     |> Room.changeset(attrs)
     |> Repo.insert()
+
+    {:ok, Repo.preload(room, [:users])}
   end
 
   @doc """
