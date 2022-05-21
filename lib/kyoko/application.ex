@@ -15,9 +15,10 @@ defmodule Kyoko.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: Kyoko.PubSub},
       # Start the Endpoint (http/https)
-      KyokoWeb.Endpoint
+      KyokoWeb.Endpoint,
       # Start a worker by calling: Kyoko.Worker.start_link(arg)
       # {Kyoko.Worker, arg}
+      KyokoWeb.Presence
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
