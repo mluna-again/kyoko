@@ -1,6 +1,9 @@
 defmodule KyokoWeb.GameChannel do
   use KyokoWeb, :channel
   alias KyokoWeb.Presence
+  alias Kyoko.PubSub
+
+  require Logger
 
   @impl true
   def join("room:" <> room_id, %{"player" => player_name} = payload, socket) do
@@ -37,10 +40,17 @@ defmodule KyokoWeb.GameChannel do
     {:ok, _} =
       Presence.track(self(), socket.assigns.room_id, socket.assigns.player_name, %{
         online_at: inspect(System.system_time(:second)),
-        player_name: socket.assigns.player_name
+        name: socket.assigns.player_name
       })
 
+    Phoenix.PubSub.subscribe(PubSub, socket.assigns.room_id)
+
     push(socket, "presence_state", Presence.list(socket.assigns.room_id))
+    {:noreply, socket}
+  end
+
+  def handle_info(%{event: "presence_diff", payload: payload}, socket) do
+    broadcast(socket, "presence_diff", payload)
     {:noreply, socket}
   end
 
