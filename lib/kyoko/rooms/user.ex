@@ -15,5 +15,7 @@ defmodule Kyoko.Rooms.User do
     user
     |> cast(attrs, [:name, :selection, :room_id])
     |> validate_required([:name, :room_id])
+    |> validate_length(:name, min: 4, max: 30)
+    |> validate_format(:name, ~r/^[A-Z ]+$/i)
   end
 end

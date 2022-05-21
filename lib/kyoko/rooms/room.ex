@@ -15,6 +15,8 @@ defmodule Kyoko.Rooms.Room do
     room
     |> cast(attrs, [:name])
     |> validate_required([:name])
+    |> validate_length(:name, min: 4, max: 30)
+    |> validate_format(:name, ~r/^[A-Z ]+$/i)
     |> put_code()
     |> unique_constraint(:code)
   end
