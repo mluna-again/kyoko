@@ -22,6 +22,10 @@ config :logger, level: :info
 config :kyoko, KyokoWeb.Endpoint,
   url: [host: "kyoko-server.herokuapp.com/", port: 443],
   url: [scheme: "https", host: "mysterious-meadow-6277.herokuapp.com", port: 443],
+  check_origin: [
+    "https://kyoko-server.herokuapp.com/",
+    "https://www.kyoko-server.herokuapp.com/",
+  ],
   force_ssl: [rewrite_on: [:x_forwarded_proto]]
   # https: [
   #   port: 443,
