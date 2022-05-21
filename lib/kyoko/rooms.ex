@@ -7,10 +7,13 @@ defmodule Kyoko.Rooms do
   alias Kyoko.Repo
 
   alias Kyoko.Rooms.Room
+  alias Kyoko.Rooms.User
 
-  def add_user_to_room() do
+  def add_user_to_room(room, user) do
+    %User{room_id: room.id}
+    |> User.changeset(user)
+    |> Repo.insert()
   end
-
 
   @doc """
   Returns the list of rooms.
