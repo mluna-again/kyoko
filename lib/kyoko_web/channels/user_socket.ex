@@ -8,7 +8,7 @@ defmodule KyokoWeb.UserSocket do
 
   ## Channels
 
-  channel "game:*", KyokoWeb.GameChannel
+  channel "room:*", KyokoWeb.GameChannel
 
   # Socket params are passed from the client and can
   # be used to verify and authenticate a user. After

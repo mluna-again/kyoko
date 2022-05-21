@@ -3,10 +3,10 @@ defmodule KyokoWeb.GameChannel do
   alias KyokoWeb.Presence
 
   @impl true
-  def join("game:" <> game_id, payload, socket) do
+  def join("room:" <> room_id, payload, socket) do
     if authorized?(payload) do
       send(self(), :after_join)
-      {:ok, assign(socket, :game_id, game_id)}
+      {:ok, assign(socket, :room_id, room_id)}
     else
       {:error, %{reason: "unauthorized"}}
     end
@@ -29,8 +29,8 @@ defmodule KyokoWeb.GameChannel do
 
   def handle_info(:after_join, socket) do
     {:ok, _} =
-      Presence.track(socket, socket.assigns.game_id, %{
-        online_at: inspect(System.system_time(:second))
+      Presence.track(socket, socket.assigns.room_id, %{
+        online_at: inspect(System.system_time(:second)),
       })
 
     push(socket, "presence_state", Presence.list(socket))
