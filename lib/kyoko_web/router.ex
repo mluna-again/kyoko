@@ -7,6 +7,8 @@ defmodule KyokoWeb.Router do
 
   scope "/api", KyokoWeb do
     pipe_through :api
+
+    resources "/rooms", RoomController, only: ~w(create show update)a
   end
 
   # Enables LiveDashboard only for development
