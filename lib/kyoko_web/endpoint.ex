@@ -11,7 +11,7 @@ defmodule KyokoWeb.Endpoint do
   ]
 
   socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
-  socket "/socket", KyokoWeb.UserSocket, websocket: true, longpolling: false
+  socket "/socket", KyokoWeb.UserSocket, websocket: [timeout: 45_000], longpolling: false
 
   # Serve at "/" the static files from "priv/static" directory.
   #
