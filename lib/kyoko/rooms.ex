@@ -42,7 +42,8 @@ defmodule Kyoko.Rooms do
       ** (Ecto.NoResultsError)
 
   """
-  def get_room!(id), do: Repo.get!(Room, id)
+  def get_room!(id), do: Repo.get!(Room, id) |> Repo.preload([:users])
+  def get_room_by!(params), do: Repo.get_by!(Room, params) |> Repo.preload([:users])
 
   @doc """
   Creates a room.

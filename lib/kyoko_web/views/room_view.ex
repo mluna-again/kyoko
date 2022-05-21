@@ -14,7 +14,12 @@ defmodule KyokoWeb.RoomView do
     %{
       id: room.id,
       code: room.code,
-      name: room.name
+      name: room.name,
+      users: render_many(room.users, __MODULE__, "user.json", as: :user)
     }
+  end
+
+  def render("user.json", %{user: user}) do
+    %{name: user.name}
   end
 end

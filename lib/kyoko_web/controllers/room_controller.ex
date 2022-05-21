@@ -16,8 +16,8 @@ defmodule KyokoWeb.RoomController do
     end
   end
 
-  def show(conn, %{"id" => id}) do
-    room = Rooms.get_room!(id)
+  def show(conn, %{"id" => room_code}) do
+    room = Rooms.get_room_by!(code: room_code)
     render(conn, "show.json", room: room)
   end
 
