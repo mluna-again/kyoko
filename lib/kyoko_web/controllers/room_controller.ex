@@ -37,7 +37,7 @@ defmodule KyokoWeb.RoomController do
     else
       conn
       |> halt()
-      |> send_resp(:unavailable, "")
+      |> send_resp(:service_unavailable, "")
     end
   end
 end
