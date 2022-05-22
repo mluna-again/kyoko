@@ -53,6 +53,12 @@ defmodule KyokoWeb.GameChannel do
   end
 
   @impl true
+  def handle_in("reveal_cards", _payload, socket) do
+    broadcast(socket, "reveal_cards", %{})
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_info(:after_join, socket) do
     room = Rooms.get_room_by!(code: socket.assigns.room_id)
 
