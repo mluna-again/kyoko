@@ -9,10 +9,58 @@ defmodule Kyoko.Rooms do
   alias Kyoko.Rooms.Room
   alias Kyoko.Rooms.User
 
+  def set_user_as_inactive(room_code, player_name) do
+    room = get_room_by!(code: room_code)
+
+    user =
+      from(user in User, where: user.room_id == ^room.id and user.name == ^player_name)
+      |> Repo.one()
+
+    if user do
+      user
+      |> User.changeset(%{active: false})
+      |> Repo.update()
+    end
+  end
+
+  def set_room_as_inactive(room_code) do
+    get_room_by!(code: room_code)
+    |> Room.changeset(%{active: false})
+    |> Repo.update()
+  end
+
+  def has_active_users?(room_code) do
+    room = get_room_by!(code: room_code)
+
+    Repo.get_by(User, room_id: room.id, active: true)
+    |> case do
+      nil ->
+        false
+
+      _ ->
+        true
+    end
+  end
+
+  def are_rooms_available() do
+    case Repo.get_by(Room, active: true) do
+      nil -> true
+      rooms -> length(rooms) < 3
+    end
+  end
+
   def add_user_to_room(room, user) do
-    %User{room_id: room.id}
-    |> User.changeset(user)
-    |> Repo.insert()
+    username = Map.get(user, "name") || Map.get(user, :name)
+
+    case Repo.get_by(User, name: username, room_id: room.id) do
+      nil ->
+        %User{room_id: room.id}
+        |> User.changeset(user)
+        |> Repo.insert()
+
+      user ->
+        {:ok, user}
+    end
   end
 
   @doc """
@@ -58,9 +106,10 @@ defmodule Kyoko.Rooms do
 
   """
   def create_room(attrs \\ %{}) do
-    {:ok, room} = %Room{}
-    |> Room.changeset(attrs)
-    |> Repo.insert()
+    {:ok, room} =
+      %Room{}
+      |> Room.changeset(attrs)
+      |> Repo.insert()
 
     {:ok, Repo.preload(room, [:users])}
   end

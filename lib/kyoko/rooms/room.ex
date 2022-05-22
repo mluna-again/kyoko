@@ -5,6 +5,7 @@ defmodule Kyoko.Rooms.Room do
   schema "rooms" do
     field :code, :string
     field :name, :string
+    field :active, :boolean, default: true
     has_many :users, Kyoko.Rooms.User
 
     timestamps()
@@ -13,7 +14,7 @@ defmodule Kyoko.Rooms.Room do
   @doc false
   def changeset(room, attrs) do
     room
-    |> cast(attrs, [:name])
+    |> cast(attrs, [:name, :active])
     |> validate_required([:name])
     |> validate_length(:name, min: 4, max: 30)
     |> validate_format(:name, ~r/^[A-Z ]+$/i)
