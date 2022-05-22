@@ -9,6 +9,19 @@ defmodule Kyoko.Rooms do
   alias Kyoko.Rooms.Room
   alias Kyoko.Rooms.User
 
+  def get_user_by!(params), do: Repo.get_by!(User, params)
+
+  def get_user_by_room!(room_code, user_name) do
+    room = get_room_by!(code: room_code)
+    get_user_by!(name: user_name, room_id: room.id)
+  end
+
+  def update_user(user, attrs) do
+    user
+    |> User.changeset(attrs)
+    |> Repo.update()
+  end
+
   def set_user_as_inactive(room_code, player_name) do
     room = get_room_by!(code: room_code)
 

@@ -33,6 +33,16 @@ defmodule KyokoWeb.GameChannel do
   end
 
   @impl true
+  def handle_in("user_selection", %{"player" => name, "selection" => selection} = payload, socket) do
+    {:ok, _user} =
+      Rooms.get_user_by_room!(socket.assigns.room_id, name)
+      |> Rooms.update_user(%{selection: selection})
+
+    broadcast(socket, "user_selection", payload)
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_info(:after_join, socket) do
     room = Rooms.get_room_by!(code: socket.assigns.room_id)
 
