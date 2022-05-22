@@ -56,12 +56,11 @@ defmodule Kyoko.Rooms do
   end
 
   def are_rooms_available?() do
-    from(room in Room, where: room.active == ^true)
-    |> Repo.all()
-    |> case do
-      nil -> true
-      rooms -> length(rooms) < 3
-    end
+    rooms =
+      from(room in Room, where: room.active == ^true)
+      |> Repo.all()
+
+    length(rooms) < 3
   end
 
   def add_user_to_room(room, user) do
