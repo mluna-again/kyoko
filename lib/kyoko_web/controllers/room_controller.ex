@@ -7,6 +7,8 @@ defmodule KyokoWeb.RoomController do
 
   action_fallback KyokoWeb.FallbackController
 
+  plug :check_for_rooms_available when action in [:create]
+
   def create(conn, %{"room" => %{"first" => first_user} = room}) do
     with {:ok, %Room{} = room} <- Rooms.create_room(room),
          {:ok, %User{} = user} <- Rooms.add_user_to_room(room, first_user) do
@@ -26,6 +28,16 @@ defmodule KyokoWeb.RoomController do
 
     with {:ok, %Room{} = room} <- Rooms.update_room(room, room_params) do
       render(conn, "show.json", room: room)
+    end
+  end
+
+  defp check_for_rooms_available(conn, _opts) do
+    if Rooms.are_rooms_available() do
+      conn
+    else
+      conn
+      |> halt()
+      |> send_resp(:unavailable, "")
     end
   end
 end
