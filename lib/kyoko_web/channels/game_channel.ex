@@ -34,9 +34,14 @@ defmodule KyokoWeb.GameChannel do
 
   @impl true
   def handle_in("user_selection", %{"player" => name, "selection" => selection} = payload, socket) do
-    {:ok, _user} =
+    {:ok, user} =
       Rooms.get_user_by_room!(socket.assigns.room_id, name)
       |> Rooms.update_user(%{selection: selection})
+
+    Presence.update(self(), socket.assigns.room_id, socket.assigns.player_name, %{
+      selection: user.selection,
+      name: socket.assigns.player_name
+    })
 
     broadcast(socket, "user_selection", payload)
     {:noreply, socket}
@@ -46,7 +51,7 @@ defmodule KyokoWeb.GameChannel do
   def handle_info(:after_join, socket) do
     room = Rooms.get_room_by!(code: socket.assigns.room_id)
 
-    {:ok, _user} =
+    {:ok, user} =
       Rooms.add_user_to_room(room, %{
         name: socket.assigns.player_name
       })
@@ -54,7 +59,8 @@ defmodule KyokoWeb.GameChannel do
     {:ok, _} =
       Presence.track(self(), socket.assigns.room_id, socket.assigns.player_name, %{
         online_at: inspect(System.system_time(:second)),
-        name: socket.assigns.player_name
+        name: socket.assigns.player_name,
+        selection: user.selection
       })
 
     Phoenix.PubSub.subscribe(PubSub, socket.assigns.room_id)
