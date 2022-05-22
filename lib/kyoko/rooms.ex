@@ -9,6 +9,20 @@ defmodule Kyoko.Rooms do
   alias Kyoko.Rooms.Room
   alias Kyoko.Rooms.User
 
+  def reset_room(room_code) do
+    users =
+      for user <- get_room_by!(code: room_code).users do
+        {:ok, user} =
+          user
+          |> User.update_changeset(%{selection: nil})
+          |> Repo.update()
+
+        user
+      end
+
+    {:ok, users}
+  end
+
   def get_user_by!(params), do: Repo.get_by!(User, params)
 
   def get_user_by_room!(room_code, user_name) do

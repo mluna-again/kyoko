@@ -59,6 +59,24 @@ defmodule KyokoWeb.GameChannel do
   end
 
   @impl true
+  def handle_in("reset_room", _payload, socket) do
+    {:ok, _users} = Rooms.reset_room(socket.assigns.room_id)
+
+    broadcast(socket, "reset_room", %{})
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_in("reset_user", _payload, socket) do
+    Presence.update(self(), socket.assigns.room_id, socket.assigns.player_name, %{
+      name: socket.assigns.player_name,
+      selection: nil
+    })
+
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_info(:after_join, socket) do
     room = Rooms.get_room_by!(code: socket.assigns.room_id)
 
