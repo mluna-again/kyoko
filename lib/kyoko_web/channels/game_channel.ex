@@ -22,7 +22,6 @@ defmodule KyokoWeb.GameChannel do
 
   @impl true
   def terminate(reason, socket) do
-    IO.inspect(reason)
     room_id = socket.assigns.room_id
     player_name = socket.assigns.player_name
 

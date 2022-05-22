@@ -25,7 +25,7 @@ defmodule Kyoko.Rooms do
 
   def set_room_as_inactive(room_code) do
     get_room_by!(code: room_code)
-    |> Room.changeset(%{active: false})
+    |> Room.update_changeset(%{active: false})
     |> Repo.update()
   end
 

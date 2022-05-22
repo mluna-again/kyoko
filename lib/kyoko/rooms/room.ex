@@ -22,6 +22,15 @@ defmodule Kyoko.Rooms.Room do
     |> unique_constraint(:code)
   end
 
+  def update_changeset(room, attrs) do
+    room
+    |> cast(attrs, [:name, :active])
+    |> validate_required([:name])
+    |> validate_length(:name, min: 4, max: 30)
+    |> validate_format(:name, ~r/^[A-Z ]+$/i)
+    |> unique_constraint(:code)
+  end
+
   defp put_code(%{valid?: false} = changeset), do: changeset
   defp put_code(changeset) do
     put_change(changeset, :code, Ecto.UUID.generate())
