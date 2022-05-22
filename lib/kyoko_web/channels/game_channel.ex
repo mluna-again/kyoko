@@ -48,6 +48,11 @@ defmodule KyokoWeb.GameChannel do
   end
 
   @impl true
+  def handle_in("user_selection", %{"player" => _name} = payload, socket) do
+    handle_in("user_selection", Map.merge(payload, %{"selection" => nil}), socket)
+  end
+
+  @impl true
   def handle_info(:after_join, socket) do
     room = Rooms.get_room_by!(code: socket.assigns.room_id)
 
