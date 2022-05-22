@@ -21,14 +21,14 @@ defmodule KyokoWeb.GameChannel do
   end
 
   @impl true
-  def terminate(reason, socket) do
+  def terminate(_reason, socket) do
     room_id = socket.assigns.room_id
     player_name = socket.assigns.player_name
 
     Rooms.set_user_as_inactive(room_id, player_name)
 
     unless Rooms.has_active_users?(room_id) do
-      Rooms.set_room_as_inactive(room_id)
+      terminate_room_if_not_in_dev(room_id)
     end
   end
 
@@ -65,6 +65,12 @@ defmodule KyokoWeb.GameChannel do
       |> Map.get(:active)
     rescue
       _e -> false
+    end
+  end
+
+  defp terminate_room_if_not_in_dev(room_id) do
+    unless Application.get_env(:kyoko, :dev, false) do
+      Rooms.set_room_as_inactive(room_id)
     end
   end
 end

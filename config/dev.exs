@@ -1,5 +1,7 @@
 import Config
 
+config :kyoko, dev: true
+
 # Configure your database
 config :kyoko, Kyoko.Repo,
   username: "postgres",
