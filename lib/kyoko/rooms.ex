@@ -56,7 +56,9 @@ defmodule Kyoko.Rooms do
   end
 
   def are_rooms_available() do
-    case Repo.get_by(Room, active: true) do
+    from(room in Room, where: room.active == ^true)
+    |> Repo.all()
+    |> case do
       nil -> true
       rooms -> length(rooms) < 3
     end
