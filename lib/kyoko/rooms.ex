@@ -55,7 +55,7 @@ defmodule Kyoko.Rooms do
     end
   end
 
-  def are_rooms_available() do
+  def are_rooms_available?() do
     from(room in Room, where: room.active == ^true)
     |> Repo.all()
     |> case do

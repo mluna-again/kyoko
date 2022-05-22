@@ -32,7 +32,7 @@ defmodule KyokoWeb.RoomController do
   end
 
   defp check_for_rooms_available(conn, _opts) do
-    if Rooms.are_rooms_available() do
+    if Rooms.are_rooms_available?() do
       conn
     else
       conn
