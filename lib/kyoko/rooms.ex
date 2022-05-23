@@ -9,6 +9,10 @@ defmodule Kyoko.Rooms do
   alias Kyoko.Rooms.Room
   alias Kyoko.Rooms.User
 
+  def close_all_rooms do
+    Repo.update_all(Room, set: [active: false])
+  end
+
   def reset_room(room_code) do
     users =
       for user <- get_room_by!(code: room_code).users do
