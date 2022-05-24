@@ -16,14 +16,12 @@ defmodule Kyoko.Rooms.User do
     user
     |> cast(attrs, [:name, :selection, :room_id, :active])
     |> validate_required([:name, :room_id])
-    |> validate_length(:name, min: 4, max: 30)
-    |> validate_format(:name, ~r/^[A-Z ]+$/i)
+    |> validate_length(:name, max: 30)
   end
 
   def update_changeset(user, attrs) do
     user
     |> cast(attrs, [:name, :selection, :active, :room_id])
-    |> validate_length(:name, min: 4, max: 30)
-    |> validate_format(:name, ~r/^[A-Z ]+$/i)
+    |> validate_length(:name, max: 30)
   end
 end
