@@ -78,7 +78,7 @@ defmodule Kyoko.Rooms do
       from(room in Room, where: room.active == ^true)
       |> Repo.all()
 
-    length(rooms) < 3
+    length(rooms) < 15
   end
 
   def add_user_to_room(room, user) do
