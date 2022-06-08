@@ -67,6 +67,12 @@ defmodule KyokoWeb.GameChannel do
   end
 
   @impl true
+  def handle_in("toggle_" <> setting, %{"active" => active}, socket) do
+    broadcast(socket, "toggle_#{setting}", %{active: active})
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_in("reset_user", _payload, socket) do
     Presence.update(self(), socket.assigns.room_id, socket.assigns.player_name, %{
       name: socket.assigns.player_name,
