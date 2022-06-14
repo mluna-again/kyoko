@@ -131,7 +131,13 @@ defmodule KyokoWeb.GameChannel do
 
   defp terminate_room_if_not_in_dev(room_id) do
     unless Application.get_env(:kyoko, :dev, false) do
-      :timer.apply_after(@five_minutes, Rooms, :set_room_as_inactive, [room_id])
+      :timer.apply_after(@five_minutes, __MODULE__, :terminate_room, [room_id])
+    end
+  end
+
+  defp terminate_room(room_id) do
+    unless Rooms.has_active_users?(room_id) do
+      Rooms.set_room_as_inactive(room_id)
     end
   end
 end
