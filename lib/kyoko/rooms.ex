@@ -58,6 +58,12 @@ defmodule Kyoko.Rooms do
     end
   end
 
+  def set_room_as_inactive_if_empty(room_id) do
+    unless has_active_users?(room_id) do
+      set_room_as_inactive(room_id)
+    end
+  end
+
   def set_room_as_inactive(room_code) do
     get_room_by!(code: room_code)
     |> Room.update_changeset(%{active: false})

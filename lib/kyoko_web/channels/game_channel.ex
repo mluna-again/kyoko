@@ -1,5 +1,5 @@
 defmodule KyokoWeb.GameChannel do
-  @five_minutes 60 * 5
+  @five_minutes 60 * 1000 * 5
 
   use KyokoWeb, :channel
   alias KyokoWeb.Presence
@@ -30,7 +30,7 @@ defmodule KyokoWeb.GameChannel do
     Rooms.set_user_as_inactive(room_id, player_name)
 
     unless Rooms.has_active_users?(room_id) do
-      terminate_room_if_not_in_dev(room_id)
+      :timer.apply_after(@five_minutes, Rooms, :set_room_as_inactive_if_empty, [room_id])
     end
   end
 
@@ -126,18 +126,6 @@ defmodule KyokoWeb.GameChannel do
       |> Map.get(:active)
     rescue
       _e -> false
-    end
-  end
-
-  defp terminate_room_if_not_in_dev(room_id) do
-    unless Application.get_env(:kyoko, :dev, false) do
-      :timer.apply_after(@five_minutes, __MODULE__, :terminate_room, [room_id])
-    end
-  end
-
-  defp terminate_room(room_id) do
-    unless Rooms.has_active_users?(room_id) do
-      Rooms.set_room_as_inactive(room_id)
     end
   end
 end
