@@ -35,14 +35,19 @@ defmodule KyokoWeb.GameChannel do
   end
 
   @impl true
-  def handle_in("user_selection", %{"player" => name, "selection" => selection} = payload, socket) do
+  def handle_in(
+        "user_selection",
+        %{"player" => name, "selection" => selection, "emoji" => emoji} = payload,
+        socket
+      ) do
     {:ok, user} =
       Rooms.get_user_by_room!(socket.assigns.room_id, name)
       |> Rooms.update_user(%{selection: selection})
 
     Presence.update(self(), socket.assigns.room_id, socket.assigns.player_name, %{
       selection: user.selection,
-      name: socket.assigns.player_name
+      name: socket.assigns.player_name,
+      emoji: emoji
     })
 
     broadcast(socket, "user_selection", payload)
