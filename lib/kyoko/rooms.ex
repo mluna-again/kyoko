@@ -40,7 +40,13 @@ defmodule Kyoko.Rooms do
     |> Repo.update()
   end
 
-  def set_user_as_inactive(room_code, player_name) do
+  def set_user_as_inactive(room_code, player_name),
+    do: set_user_status(room_code, player_name, false)
+
+  def set_user_as_active(room_code, player_name),
+    do: set_user_status(room_code, player_name, true)
+
+  def set_user_status(room_code, player_name, status) do
     room = get_room_by!(code: room_code)
 
     user =
@@ -48,9 +54,7 @@ defmodule Kyoko.Rooms do
       |> Repo.one()
 
     if user do
-      user
-      |> User.changeset(%{active: false})
-      |> Repo.update()
+      update_user(user, %{active: status})
     end
   end
 

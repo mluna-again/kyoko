@@ -59,6 +59,12 @@ defmodule KyokoWeb.GameChannel do
   end
 
   @impl true
+  def handle_in("change_emojis", %{"emojis" => _emojis} = payload, socket) do
+    broadcast(socket, "change_emojis", payload)
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_in("reset_room", _payload, socket) do
     {:ok, _users} = Rooms.reset_room(socket.assigns.room_id)
 
@@ -90,6 +96,8 @@ defmodule KyokoWeb.GameChannel do
       Rooms.add_user_to_room(room, %{
         name: socket.assigns.player_name
       })
+
+    Rooms.set_user_as_active(socket.assigns.room_id, socket.assigns.player_name)
 
     {:ok, _} =
       Presence.track(self(), socket.assigns.room_id, socket.assigns.player_name, %{
