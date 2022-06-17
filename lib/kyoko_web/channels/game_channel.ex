@@ -66,7 +66,8 @@ defmodule KyokoWeb.GameChannel do
   end
 
   @impl true
-  def handle_in("change_emojis", %{"emojis" => _emojis} = payload, socket) do
+  def handle_in("change_emojis", %{"emojis" => emojis} = payload, socket) do
+    Rooms.update_emojis!(socket.assigns.room_id, emojis)
     broadcast(socket, "change_emojis", payload)
     {:noreply, socket}
   end
@@ -81,6 +82,7 @@ defmodule KyokoWeb.GameChannel do
 
   @impl true
   def handle_in("toggle_" <> setting, %{"active" => active}, socket) do
+    Rooms.toggle_setting(socket.assigns.room_id, setting)
     broadcast(socket, "toggle_#{setting}", %{active: active})
     {:noreply, socket}
   end

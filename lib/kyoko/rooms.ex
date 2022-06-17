@@ -10,6 +10,26 @@ defmodule Kyoko.Rooms do
   alias Kyoko.Rooms.User
   alias Kyoko.Rooms.Settings
 
+  def update_emojis!(room_code, emojis) do
+    room = Repo.preload(get_room_by!(code: room_code), [:settings])
+
+    room.settings
+    |> Settings.update_changeset(%{emojis: emojis})
+    |> Repo.update!()
+  end
+
+  def toggle_setting(room_code, setting_str) do
+    room = Repo.preload(get_room_by!(code: room_code), [:settings])
+
+    setting = Map.get(room.settings, String.to_existing_atom(setting_str))
+
+    if setting do
+      room.settings
+      |> Settings.update_changeset(%{setting_str: !setting})
+      |> Repo.update()
+    end
+  end
+
   def create_settings_for_room(%Room{} = room, %{} = default_settings \\ %{}) do
     Ecto.build_assoc(room, :settings, %Settings{})
     |> Settings.changeset(default_settings)
