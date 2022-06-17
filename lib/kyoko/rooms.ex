@@ -18,15 +18,15 @@ defmodule Kyoko.Rooms do
     |> Repo.update!()
   end
 
-  def toggle_setting(room_code, setting_str) do
+  def toggle_setting(room_code, setting_str, state) do
     room = Repo.preload(get_room_by!(code: room_code), [:settings])
 
     setting = Map.get(room.settings, String.to_existing_atom(setting_str))
 
-    if setting do
+    unless is_nil(setting) do
       room.settings
-      |> Settings.update_changeset(%{setting_str: !setting})
-      |> Repo.update()
+      |> Settings.update_changeset(%{"#{setting_str}" => state})
+      |> Repo.update!()
     end
   end
 

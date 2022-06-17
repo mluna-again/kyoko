@@ -82,7 +82,7 @@ defmodule KyokoWeb.GameChannel do
 
   @impl true
   def handle_in("toggle_" <> setting, %{"active" => active}, socket) do
-    Rooms.toggle_setting(socket.assigns.room_id, setting)
+    Rooms.toggle_setting(socket.assigns.room_id, setting, active)
     broadcast(socket, "toggle_#{setting}", %{active: active})
     {:noreply, socket}
   end
