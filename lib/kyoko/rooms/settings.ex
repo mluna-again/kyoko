@@ -3,8 +3,8 @@ defmodule Kyoko.Rooms.Settings do
   import Ecto.Changeset
 
   schema "room_settings" do
-    field :animation, :boolean, default: false
-    field :clock, :boolean, default: false
+    field :animation, :boolean, default: true
+    field :clock, :boolean, default: true
     field :emojis, :string
     belongs_to :room, Kyoko.Rooms.Room
 
