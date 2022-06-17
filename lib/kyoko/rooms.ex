@@ -8,6 +8,13 @@ defmodule Kyoko.Rooms do
 
   alias Kyoko.Rooms.Room
   alias Kyoko.Rooms.User
+  alias Kyoko.Rooms.Settings
+
+  def create_settings_for_room(%Room{} = room, %{} = default_settings \\ %{}) do
+    Ecto.build_assoc(room, :settings, %Settings{})
+    |> Settings.changeset(default_settings)
+    |> Repo.insert()
+  end
 
   def close_all_rooms do
     Repo.update_all(Room, set: [active: false])
@@ -132,8 +139,8 @@ defmodule Kyoko.Rooms do
       ** (Ecto.NoResultsError)
 
   """
-  def get_room!(id), do: Repo.get!(Room, id) |> Repo.preload([:users])
-  def get_room_by!(params), do: Repo.get_by!(Room, params) |> Repo.preload([:users])
+  def get_room!(id), do: Repo.get!(Room, id) |> Repo.preload([:users, :settings])
+  def get_room_by!(params), do: Repo.get_by!(Room, params) |> Repo.preload([:users, :settings])
 
   @doc """
   Creates a room.
@@ -153,7 +160,9 @@ defmodule Kyoko.Rooms do
       |> Room.changeset(attrs)
       |> Repo.insert()
 
-    {:ok, Repo.preload(room, [:users])}
+    with {:ok, _settings} <- create_settings_for_room(room) do
+      {:ok, Repo.preload(room, [:users, :settings])}
+    end
   end
 
   @doc """

@@ -4,6 +4,7 @@ defmodule KyokoWeb.RoomController do
   alias Kyoko.Rooms
   alias Kyoko.Rooms.Room
   alias Kyoko.Rooms.User
+  alias Kyoko.Rooms.Settings
 
   action_fallback KyokoWeb.FallbackController
 
@@ -11,6 +12,7 @@ defmodule KyokoWeb.RoomController do
 
   def create(conn, %{"room" => %{"first" => first_user} = room}) do
     with {:ok, %Room{} = room} <- Rooms.create_room(room),
+         {:ok, %Settings{} = _settings} <- Rooms.create_settings_for_room(room),
          {:ok, %User{} = user} <- Rooms.add_user_to_room(room, first_user) do
       conn
       |> put_status(:created)

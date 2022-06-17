@@ -7,6 +7,7 @@ defmodule Kyoko.Rooms.Room do
     field :name, :string
     field :active, :boolean, default: true
     has_many :users, Kyoko.Rooms.User
+    has_one :settings, Kyoko.Rooms.Settings
 
     timestamps()
   end

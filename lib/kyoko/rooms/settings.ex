@@ -6,15 +6,17 @@ defmodule Kyoko.Rooms.Settings do
     field :animation, :boolean, default: false
     field :clock, :boolean, default: false
     field :emojis, :string
-    field :room_id, :id
+    belongs_to :room, Kyoko.Rooms.Room
 
     timestamps()
   end
 
-  @doc false
   def changeset(settings, attrs) do
     settings
     |> cast(attrs, [:clock, :animation, :emojis])
+    |> put_emojis()
     |> validate_required([:clock, :animation, :emojis])
   end
+
+  defp put_emojis(%Ecto.Changeset{} = changeset), do: put_change(changeset, :emojis, "😑👍")
 end
