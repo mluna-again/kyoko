@@ -24,8 +24,7 @@ config :kyoko, KyokoWeb.Endpoint,
   url: [scheme: "https", host: "mysterious-meadow-6277.herokuapp.com", port: 443],
   check_origin: [
     "https://aesthetic-faun-73eb0e.netlify.app/",
-    "https://lost-navi.xyz/",
-    "http://localhost:3000/",
+    "https://lost-navi.xyz/"
   ],
   force_ssl: [rewrite_on: [:x_forwarded_proto]]
   # https: [
