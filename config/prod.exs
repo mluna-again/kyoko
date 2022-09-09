@@ -51,3 +51,6 @@ config :kyoko, KyokoWeb.Endpoint,
 #       force_ssl: [hsts: true]
 #
 # Check `Plug.SSL` for all available options in `force_ssl`.
+
+config :cors_plug,
+  origin: ["https://lost-navi.xyz"]
