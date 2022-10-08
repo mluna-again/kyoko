@@ -5,7 +5,7 @@ config :kyoko, dev: true
 # Configure your database
 config :kyoko, Kyoko.Repo,
   username: "postgres",
-  password: "password",
+  password: System.get_env("PGPASSWORD") || "password",
   hostname: "localhost",
   database: "kyoko_dev",
   show_sensitive_data_on_connection_error: true,
