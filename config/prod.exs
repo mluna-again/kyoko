@@ -27,12 +27,13 @@ config :kyoko, KyokoWeb.Endpoint,
     "https://lost-navi.xyz/"
   ],
   force_ssl: [rewrite_on: [:x_forwarded_proto]]
-  # https: [
-  #   port: 443,
-  #   cipher_suite: :strong,
-  #   keyfile: System.get_env("SOME_APP_SSL_KEY_PATH"),
-  #   certfile: System.get_env("SOME_APP_SSL_CERT_PATH")
-  # ]
+
+# https: [
+#   port: 443,
+#   cipher_suite: :strong,
+#   keyfile: System.get_env("SOME_APP_SSL_KEY_PATH"),
+#   certfile: System.get_env("SOME_APP_SSL_CERT_PATH")
+# ]
 #
 # The `cipher_suite` is set to `:strong` to support only the
 # latest and more secure SSL ciphers. This means old browsers
@@ -53,4 +54,4 @@ config :kyoko, KyokoWeb.Endpoint,
 # Check `Plug.SSL` for all available options in `force_ssl`.
 
 config :cors_plug,
-  origin: ["https://lost-navi.xyz"]
+  origin: ["https://aesthetic-faun-73eb0e.netlify.app"]
