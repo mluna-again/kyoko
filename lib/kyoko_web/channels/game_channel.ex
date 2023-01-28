@@ -61,6 +61,10 @@ defmodule KyokoWeb.GameChannel do
 
   @impl true
   def handle_in("reveal_cards", _payload, socket) do
+    {:ok, _room} =
+      Rooms.get_room_by!(code: socket.assigns.room_id)
+      |> Rooms.update_room(%{status: "game_over"})
+
     broadcast(socket, "reveal_cards", %{})
     {:noreply, socket}
   end

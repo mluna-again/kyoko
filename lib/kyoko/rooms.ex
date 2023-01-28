@@ -41,8 +41,9 @@ defmodule Kyoko.Rooms do
   end
 
   def reset_room(room_code) do
+    room = get_room_by!(code: room_code)
     users =
-      for user <- get_room_by!(code: room_code).users do
+      for user <- room.users do
         {:ok, user} =
           user
           |> User.update_changeset(%{selection: nil})
@@ -51,6 +52,7 @@ defmodule Kyoko.Rooms do
         user
       end
 
+    {:ok, _room} = update_room(room, %{status: "playing"})
     {:ok, users}
   end
 
@@ -199,7 +201,7 @@ defmodule Kyoko.Rooms do
   """
   def update_room(%Room{} = room, attrs) do
     room
-    |> Room.changeset(attrs)
+    |> Room.update_changeset(attrs)
     |> Repo.update()
   end
 
