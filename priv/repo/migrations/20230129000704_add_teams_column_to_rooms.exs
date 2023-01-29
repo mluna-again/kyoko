@@ -3,7 +3,7 @@ defmodule Kyoko.Repo.Migrations.AddTeamsColumnToRooms do
 
   def change do
     alter table(:rooms) do
-      add :teams_enabled, :boolean, null: false
+      add :teams_enabled, :boolean, null: false, default: false
     end
 
     alter table(:room_users) do
