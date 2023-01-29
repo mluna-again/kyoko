@@ -15,12 +15,12 @@ defmodule Kyoko.Rooms.User do
   end
 
   @doc false
-  def changeset(user, attrs) do
+  def changeset(user, attrs, teams_enabled) do
     user
     |> cast(attrs, [:name, :selection, :room_id, :active, :team])
     |> validate_required([:name, :room_id])
     |> validate_length(:name, max: 30)
-    |> validate_team()
+    |> validate_team(teams_enabled)
   end
 
   def update_changeset(user, attrs) do
@@ -29,7 +29,7 @@ defmodule Kyoko.Rooms.User do
     |> validate_length(:name, max: 30)
   end
 
-  defp validate_team(%{changes: %{team: team}} = changeset) do
+  defp validate_team(%{changes: %{team: team}} = changeset, true) do
     if Enum.member?(@valid_teams, team) do
       changeset
     else
@@ -37,5 +37,9 @@ defmodule Kyoko.Rooms.User do
     end
   end
 
-  defp validate_team(changeset), do: changeset
+  defp validate_team(changeset, true) do
+    add_error(changeset, :team, "is required")
+  end
+
+  defp validate_team(changeset, _), do: changeset
 end

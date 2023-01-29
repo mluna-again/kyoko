@@ -65,7 +65,7 @@ defmodule Kyoko.Rooms do
 
   def update_user(user, attrs) do
     user
-    |> User.changeset(attrs)
+    |> User.update_changeset(attrs)
     |> Repo.update()
   end
 
@@ -126,7 +126,7 @@ defmodule Kyoko.Rooms do
     case Repo.get_by(User, name: username, room_id: room.id) do
       nil ->
         %User{room_id: room.id}
-        |> User.changeset(user)
+        |> User.changeset(user, room.teams_enabled)
         |> Repo.insert()
 
       user ->
