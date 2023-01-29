@@ -46,6 +46,7 @@ defmodule Kyoko.Rooms.Room do
   defp validate_status(changeset), do: changeset
 
   defp put_code(%{valid?: false} = changeset), do: changeset
+
   defp put_code(changeset) do
     put_change(changeset, :code, Ecto.UUID.generate())
   end

@@ -42,6 +42,7 @@ defmodule Kyoko.Rooms do
 
   def reset_room(room_code) do
     room = get_room_by!(code: room_code)
+
     users =
       for user <- room.users do
         {:ok, user} =
