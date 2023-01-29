@@ -81,11 +81,15 @@ defmodule KyokoWeb.GameChannel do
 
   @impl true
   def handle_in("reset_room", _payload, socket) do
-    spawn(fn ->
-      {:ok, _users} = Rooms.reset_room(socket.assigns.room_id)
-    end)
+    {:ok, _users} = Rooms.reset_room(socket.assigns.room_id)
 
     broadcast(socket, "reset_room", %{})
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_in("toggle_emojis", %{"active" => active}, socket) do
+    broadcast(socket, "toggle_emojis", %{active: active})
     {:noreply, socket}
   end
 
