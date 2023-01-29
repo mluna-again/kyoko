@@ -46,11 +46,12 @@ defmodule KyokoWeb.GameChannel do
       Rooms.get_user_by_room!(socket.assigns.room_id, name)
       |> Rooms.update_user(%{selection: selection})
 
-    Presence.update(self(), socket.assigns.room_id, socket.assigns.player_name, %{
-      selection: user.selection,
-      name: socket.assigns.player_name,
-      emoji: emoji
-    })
+    Presence.update(
+      self(),
+      socket.assigns.room_id,
+      socket.assigns.player_name,
+      Map.put(format_user(socket, user), :emoji, emoji)
+    )
 
     broadcast(socket, "user_selection", payload)
     {:noreply, socket}
@@ -95,10 +96,7 @@ defmodule KyokoWeb.GameChannel do
 
   @impl true
   def handle_in("reset_user", _payload, socket) do
-    Presence.update(self(), socket.assigns.room_id, socket.assigns.player_name, %{
-      name: socket.assigns.player_name,
-      selection: nil
-    })
+    Presence.update(self(), socket.assigns.room_id, socket.assigns.player_name, format_user(socket, socket.whole_user))
 
     {:noreply, socket}
   end
@@ -120,25 +118,29 @@ defmodule KyokoWeb.GameChannel do
         self(),
         socket.assigns.room_id,
         socket.assigns.player_name,
-        Map.merge(
-          %{
-            online_at: inspect(System.system_time(:second)),
-            name: socket.assigns.player_name,
-            selection: user.selection
-          },
-          RoomView.render("user.json", %{user: user})
-        )
+        format_user(socket, user)
       )
 
     Phoenix.PubSub.subscribe(PubSub, socket.assigns.room_id)
 
     push(socket, "presence_state", Presence.list(socket.assigns.room_id))
-    {:noreply, socket}
+    {:noreply, assign(socket, :whole_user, user)}
   end
 
   def handle_info(%{event: "presence_diff", payload: payload}, socket) do
     broadcast(socket, "presence_diff", payload)
     {:noreply, socket}
+  end
+
+  defp format_user(socket, user) do
+    Map.merge(
+      %{
+        online_at: inspect(System.system_time(:second)),
+        name: socket.assigns.player_name,
+        selection: user.selection
+      },
+      RoomView.render("user.json", %{user: user})
+    )
   end
 
   # Add authorization logic here as required.
