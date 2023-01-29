@@ -5,15 +5,17 @@ defmodule KyokoWeb.GameChannel do
   alias KyokoWeb.Presence
   alias Kyoko.Rooms
   alias Kyoko.PubSub
+  alias KyokoWeb.RoomView
 
   @impl true
-  def join("room:" <> room_id, %{"player" => player_name} = _payload, socket) do
+  def join("room:" <> room_id, %{"player" => player_name, "team" => team} = _payload, socket) do
     if authorized?(room_id) do
       send(self(), :after_join)
 
       socket =
         socket
         |> assign(:player_name, player_name)
+        |> assign(:team, team)
         |> assign(:room_id, room_id)
 
       {:ok, socket}
@@ -107,17 +109,26 @@ defmodule KyokoWeb.GameChannel do
 
     {:ok, user} =
       Rooms.add_user_to_room(room, %{
-        name: socket.assigns.player_name
+        name: socket.assigns.player_name,
+        team: socket.assigns.team
       })
 
     Rooms.set_user_as_active(socket.assigns.room_id, socket.assigns.player_name)
 
     {:ok, _} =
-      Presence.track(self(), socket.assigns.room_id, socket.assigns.player_name, %{
-        online_at: inspect(System.system_time(:second)),
-        name: socket.assigns.player_name,
-        selection: user.selection
-      })
+      Presence.track(
+        self(),
+        socket.assigns.room_id,
+        socket.assigns.player_name,
+        Map.merge(
+          %{
+            online_at: inspect(System.system_time(:second)),
+            name: socket.assigns.player_name,
+            selection: user.selection
+          },
+          RoomView.render("user.json", %{user: user})
+        )
+      )
 
     Phoenix.PubSub.subscribe(PubSub, socket.assigns.room_id)
 

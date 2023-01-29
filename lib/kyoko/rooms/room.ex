@@ -9,7 +9,7 @@ defmodule Kyoko.Rooms.Room do
     field :name, :string
     field :active, :boolean, default: true
     field :status, :string, default: "playing"
-    field :teams_enabled, :boolean, default: true
+    field :teams_enabled, :boolean, default: false
     has_many :users, Kyoko.Rooms.User
     has_one :settings, Kyoko.Rooms.Settings
 
