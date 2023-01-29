@@ -98,7 +98,7 @@ defmodule KyokoWeb.GameChannel do
 
   @impl true
   def handle_in("reset_user", _payload, socket) do
-    Presence.update(self(), socket.assigns.room_id, socket.assigns.player_name, format_user(socket, socket.whole_user))
+    Presence.update(self(), socket.assigns.room_id, socket.assigns.player_name, format_user(socket, socket.assigns.whole_user))
 
     {:noreply, socket}
   end
