@@ -9,30 +9,30 @@ defmodule Kyoko.Rooms.Room do
     field :name, :string
     field :active, :boolean, default: true
     field :status, :string, default: "playing"
+    field :teams_enabled, :boolean, default: true
     has_many :users, Kyoko.Rooms.User
     has_one :settings, Kyoko.Rooms.Settings
 
     timestamps()
   end
 
-  @doc false
-  def changeset(room, attrs) do
+  defp _changeset(room, attrs) do
     room
-    |> cast(attrs, [:name, :active])
+    |> cast(attrs, [:name, :active, :teams_enabled, :status])
     |> validate_required([:name])
     |> validate_length(:name, max: 30)
-    |> put_code()
     |> unique_constraint(:code)
     |> validate_status()
   end
 
+  @doc false
+  def changeset(room, attrs) do
+    _changeset(room, attrs)
+    |> put_code()
+  end
+
   def update_changeset(room, attrs) do
-    room
-    |> cast(attrs, [:name, :active, :status])
-    |> validate_required([:name])
-    |> validate_length(:name, max: 30)
-    |> unique_constraint(:code)
-    |> validate_status()
+    _changeset(room, attrs)
   end
 
   defp validate_status(%{changes: %{status: status}} = changeset) do

@@ -17,7 +17,8 @@ defmodule KyokoWeb.RoomView do
       name: room.name,
       users: render_many(room.users, __MODULE__, "user.json", as: :user),
       settings: render_one(room.settings, __MODULE__, "settings.json", as: :settings),
-      status: room.status
+      status: room.status,
+      teams: room.teams_enabled
     }
   end
 
