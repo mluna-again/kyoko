@@ -106,7 +106,7 @@ defmodule KyokoWeb.GameChannel do
       self(),
       socket.assigns.room_id,
       socket.assigns.player_name,
-      Map.put(format_user(socket, socket.assigns.whole_user), :selection, nil)
+      cleanup_user(socket, socket.assigns.whole_user)
     )
 
     {:noreply, socket}
@@ -152,6 +152,12 @@ defmodule KyokoWeb.GameChannel do
       },
       RoomView.render("user.json", %{user: user})
     )
+  end
+
+  defp cleanup_user(socket, user) do
+    format_user(socket, user)
+    |> Map.put(:selection, nil)
+    |> Map.put(:emoji, nil)
   end
 
   # Add authorization logic here as required.
