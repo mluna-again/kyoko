@@ -3,6 +3,7 @@ defmodule Kyoko.Rooms.Room do
   import Ecto.Changeset
 
   @valid_states ["playing", "game_over"]
+  @valid_rating_types ["shirts", "cards"]
 
   schema "rooms" do
     field :code, :string
@@ -10,6 +11,7 @@ defmodule Kyoko.Rooms.Room do
     field :active, :boolean, default: true
     field :status, :string, default: "playing"
     field :teams_enabled, :boolean, default: false
+    field :rating_type, :string, default: "shirts"
     has_many :users, Kyoko.Rooms.User
     has_one :settings, Kyoko.Rooms.Settings
 
@@ -22,7 +24,8 @@ defmodule Kyoko.Rooms.Room do
     |> validate_required([:name])
     |> validate_length(:name, max: 30)
     |> unique_constraint(:code)
-    |> validate_status()
+    |> validate_inclusion(:status, @valid_states)
+    |> validate_inclusion(:rating_type, @valid_rating_types)
   end
 
   @doc false
@@ -34,16 +37,6 @@ defmodule Kyoko.Rooms.Room do
   def update_changeset(room, attrs) do
     _changeset(room, attrs)
   end
-
-  defp validate_status(%{changes: %{status: status}} = changeset) do
-    if Enum.member?(@valid_states, status) do
-      changeset
-    else
-      add_error(changeset, :status, "is invalid")
-    end
-  end
-
-  defp validate_status(changeset), do: changeset
 
   defp put_code(%{valid?: false} = changeset), do: changeset
 
