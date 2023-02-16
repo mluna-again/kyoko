@@ -24,5 +24,5 @@ defmodule Kyoko.Rooms.Settings do
     |> validate_required([:clock, :animation, :emojis])
   end
 
-  defp put_emojis(%Ecto.Changeset{} = changeset), do: put_change(changeset, :emojis, "😑👍")
+  defp put_emojis(%Ecto.Changeset{} = changeset), do: put_change(changeset, :emojis, "🎈🎉🍾🥳")
 end
