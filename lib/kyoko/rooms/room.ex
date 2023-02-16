@@ -20,7 +20,7 @@ defmodule Kyoko.Rooms.Room do
 
   defp _changeset(room, attrs) do
     room
-    |> cast(attrs, [:name, :active, :teams_enabled, :status])
+    |> cast(attrs, [:name, :active, :teams_enabled, :status, :rating_type])
     |> validate_required([:name])
     |> validate_length(:name, max: 30)
     |> unique_constraint(:code)
