@@ -21,7 +21,7 @@ defmodule Kyoko.Rooms.Settings do
   def update_changeset(settings, attrs) do
     settings
     |> cast(attrs, [:clock, :animation, :emojis])
-    |> validate_required([:clock, :animation, :emojis])
+    |> validate_required([:clock, :animation])
   end
 
   defp put_emojis(%Ecto.Changeset{} = changeset), do: put_change(changeset, :emojis, "🎈🎉🍾🥳")
