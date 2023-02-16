@@ -4,12 +4,12 @@ config :kyoko, dev: true
 
 # Configure your database
 config :kyoko, Kyoko.Repo,
-  username: "postgres",
+  username: System.get_env("PGUSER") || "postgres",
   password: System.get_env("PGPASSWORD") || "password",
-  hostname: "localhost",
-  database: "kyoko_dev",
+  hostname: System.get_env("PGHOSTNAME") || "localhost",
+  database: System.get_env("PGDATABASE") || "kyoko_dev",
   show_sensitive_data_on_connection_error: true,
-  pool_size: 10
+  pool_size: System.get_env("POOL_SIZE") || 10
 
 # For development, we disable any cache and enable
 # debugging and code reloading.
