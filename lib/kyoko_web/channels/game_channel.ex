@@ -116,7 +116,7 @@ defmodule KyokoWeb.GameChannel do
   def handle_in("user:kick", %{"name" => user_name}, socket) do
     user = Rooms.get_user_by!(name: user_name, room_id: socket.assigns.room.id)
 
-    {:ok, user} = Rooms.remove_user_from_room(socket.assigns.room, user)
+    {:ok, _user} = Rooms.remove_user_from_room(socket.assigns.room, user)
     
     broadcast(socket, "user:kicked", %{name: user_name})
     {:reply, :ok, socket}
