@@ -11,6 +11,12 @@ defmodule KyokoWeb.Router do
     resources "/rooms", RoomController, only: ~w(create show update)a
   end
 
+  scope "/api", KyokoWeb do
+    pipe_through :api
+
+    patch "/users/:user", UserController, :update
+  end
+
   # Enables LiveDashboard only for development
   #
   # If you want to use the LiveDashboard in production, you should put

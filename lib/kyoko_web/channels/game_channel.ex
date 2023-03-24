@@ -8,15 +8,15 @@ defmodule KyokoWeb.GameChannel do
   alias KyokoWeb.RoomView
 
   @impl true
-  def join("room:" <> room_id, %{"player" => player_name, "team" => team} = _payload, socket) do
-    if authorized?(room_id) do
+  def join("room:" <> room_code, %{"player" => player_name, "team" => team} = _payload, socket) do
+    if authorized?(room_code) do
       send(self(), :after_join)
 
       socket =
         socket
         |> assign(:player_name, player_name)
         |> assign(:team, team)
-        |> assign(:room_id, room_id)
+        |> assign(:room_code, room_code)
 
       {:ok, socket}
     else
@@ -26,13 +26,13 @@ defmodule KyokoWeb.GameChannel do
 
   @impl true
   def terminate(_reason, socket) do
-    room_id = socket.assigns.room_id
+    room_code = socket.assigns.room_code
     player_name = socket.assigns.player_name
 
-    Rooms.set_user_as_inactive(room_id, player_name)
+    Rooms.set_user_as_inactive(room_code, player_name)
 
-    unless Rooms.has_active_users?(room_id) do
-      :timer.apply_after(@five_minutes, Rooms, :set_room_as_inactive_if_empty, [room_id])
+    unless Rooms.has_active_users?(room_code) do
+      :timer.apply_after(@five_minutes, Rooms, :set_room_as_inactive_if_empty, [room_code])
     end
   end
 
@@ -43,12 +43,12 @@ defmodule KyokoWeb.GameChannel do
         socket
       ) do
     {:ok, user} =
-      Rooms.get_user_by_room!(socket.assigns.room_id, name)
+      Rooms.get_user_by_room!(socket.assigns.room_code, name)
       |> Rooms.update_user(%{selection: selection})
 
     Presence.update(
       self(),
-      socket.assigns.room_id,
+      socket.assigns.room_code,
       socket.assigns.player_name,
       Map.put(format_user(socket, user), :emoji, emoji)
     )
@@ -65,7 +65,7 @@ defmodule KyokoWeb.GameChannel do
   @impl true
   def handle_in("reveal_cards", _payload, socket) do
     {:ok, _room} =
-      Rooms.get_room_by!(code: socket.assigns.room_id)
+      Rooms.get_room_by!(code: socket.assigns.room_code)
       |> Rooms.update_room(%{status: "game_over"})
 
     broadcast(socket, "reveal_cards", %{})
@@ -74,14 +74,14 @@ defmodule KyokoWeb.GameChannel do
 
   @impl true
   def handle_in("change_emojis", %{"emojis" => emojis} = payload, socket) do
-    Rooms.update_emojis!(socket.assigns.room_id, emojis)
+    Rooms.update_emojis!(socket.assigns.room_code, emojis)
     broadcast(socket, "change_emojis", payload)
     {:noreply, socket}
   end
 
   @impl true
   def handle_in("reset_room", _payload, socket) do
-    {:ok, _users} = Rooms.reset_room(socket.assigns.room_id)
+    {:ok, _users} = Rooms.reset_room(socket.assigns.room_code)
 
     broadcast(socket, "reset_room", %{})
     {:noreply, socket}
@@ -95,7 +95,7 @@ defmodule KyokoWeb.GameChannel do
 
   @impl true
   def handle_in("toggle_" <> setting, %{"active" => active}, socket) do
-    Rooms.toggle_setting(socket.assigns.room_id, setting, active)
+    Rooms.toggle_setting(socket.assigns.room_code, setting, active)
     broadcast(socket, "toggle_#{setting}", %{active: active})
     {:noreply, socket}
   end
@@ -104,7 +104,7 @@ defmodule KyokoWeb.GameChannel do
   def handle_in("reset_user", _payload, socket) do
     Presence.update(
       self(),
-      socket.assigns.room_id,
+      socket.assigns.room_code,
       socket.assigns.player_name,
       cleanup_user(socket, socket.assigns.whole_user)
     )
@@ -113,8 +113,18 @@ defmodule KyokoWeb.GameChannel do
   end
 
   @impl true
+  def handle_in("user:kick", %{"name" => user_name}, socket) do
+    user = Rooms.get_user_by!(name: user_name, room_id: socket.assigns.room.id)
+
+    {:ok, user} = Rooms.remove_user_from_room(socket.assigns.room, user)
+    
+    broadcast(socket, "user:kicked", %{name: user_name})
+    {:reply, :ok, socket}
+  end
+
+  @impl true
   def handle_info(:after_join, socket) do
-    room = Rooms.get_room_by!(code: socket.assigns.room_id)
+    room = Rooms.get_room_by!(code: socket.assigns.room_code)
 
     {:ok, user} =
       Rooms.add_user_to_room(room, %{
@@ -122,19 +132,24 @@ defmodule KyokoWeb.GameChannel do
         team: socket.assigns.team
       })
 
-    Rooms.set_user_as_active(socket.assigns.room_id, socket.assigns.player_name)
+    Rooms.set_user_as_active(socket.assigns.room_code, socket.assigns.player_name)
 
     {:ok, _} =
       Presence.track(
         self(),
-        socket.assigns.room_id,
+        socket.assigns.room_code,
         socket.assigns.player_name,
         format_user(socket, user)
       )
 
-    Phoenix.PubSub.subscribe(PubSub, socket.assigns.room_id)
+    Phoenix.PubSub.subscribe(PubSub, socket.assigns.room_code)
 
-    push(socket, "presence_state", Presence.list(socket.assigns.room_id))
+    push(socket, "presence_state", Presence.list(socket.assigns.room_code))
+
+    socket =
+      assign(socket, :whole_user, user)
+      |> assign(:room, room)
+
     {:noreply, assign(socket, :whole_user, user)}
   end
 
@@ -161,9 +176,9 @@ defmodule KyokoWeb.GameChannel do
   end
 
   # Add authorization logic here as required.
-  defp authorized?(room_id) do
+  defp authorized?(room_code) do
     try do
-      Rooms.get_room_by!(code: room_id)
+      Rooms.get_room_by!(code: room_code)
       |> Map.get(:active)
     rescue
       _e -> false

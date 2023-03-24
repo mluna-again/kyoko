@@ -40,6 +40,12 @@ defmodule Kyoko.Rooms do
     Repo.update_all(Room, set: [active: false])
   end
 
+  def remove_user_from_room(%Room{} = room, %User{} = user) do
+    user
+    |> User.update_changeset(%{room_id: nil})
+    |> Repo.update()
+  end
+
   def reset_room(room_code) do
     room = get_room_by!(code: room_code)
 
@@ -164,6 +170,19 @@ defmodule Kyoko.Rooms do
   """
   def get_room!(id), do: Repo.get!(Room, id) |> Repo.preload([:users, :settings])
   def get_room_by!(params), do: Repo.get_by!(Room, params) |> Repo.preload([:users, :settings])
+
+  @doc """
+  Gets a single user 
+
+  ## Examples
+
+  iex> get_user!(123)
+  %User{}
+
+  iex> get_user!(456)
+  ** (Ecto.NoResultsError)
+  """
+  def get_user_by!(params), do: Repo.get_by!(User, params)
 
   @doc """
   Creates a room.
