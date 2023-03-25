@@ -109,14 +109,9 @@ defmodule Kyoko.Rooms do
   def has_active_users?(room_code) do
     room = get_room_by!(code: room_code)
 
-    Repo.get_by(User, room_id: room.id, active: true)
-    |> case do
-      nil ->
-        false
-
-      _ ->
-        true
-    end
+    User
+    |> where([u], u.room_id == ^room.id and u.active == true)
+    |> Repo.exists?()
   end
 
   def are_rooms_available?() do
