@@ -10,7 +10,6 @@ defmodule KyokoWeb.UserController do
     user = Rooms.get_user_by!(name: user_name, room_id: room.id)
 
     with {:ok, user} <- Rooms.update_user(user, params) do
-
       payload = %{name: user.name, old_name: user_name}
       KyokoWeb.Endpoint.broadcast("room:#{room.code}", "user:update", payload)
 
