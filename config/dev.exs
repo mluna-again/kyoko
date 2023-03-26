@@ -62,4 +62,4 @@ config :phoenix, :stacktrace_depth, 20
 config :phoenix, :plug_init_mode, :runtime
 
 config :cors_plug,
-  origin: [~r/http:\/\/localhost.*/]
+  origin: [~r/http:\/\/localhost.*/, ~r/http:\/\/127.0.0.1*/]
