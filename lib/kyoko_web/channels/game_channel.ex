@@ -122,6 +122,15 @@ defmodule KyokoWeb.GameChannel do
     {:reply, :ok, socket}
   end
 
+  # safari doesn't want to work like a normal browser,
+  # so i need to resend this event for safari to pick up
+  @impl true
+  def handle_in("startup:sync", _payload, socket) do
+    send_presence_list(socket)
+
+    {:noreply, socket}
+  end
+
   @impl true
   def handle_info(:after_join, socket) do
     room = Rooms.get_room_by!(code: socket.assigns.room_code)
@@ -144,7 +153,7 @@ defmodule KyokoWeb.GameChannel do
 
     Phoenix.PubSub.subscribe(PubSub, socket.assigns.room_code)
 
-    push(socket, "presence_state", Presence.list(socket.assigns.room_code))
+    send_presence_list(socket)
 
     socket =
       assign(socket, :whole_user, user)
@@ -173,6 +182,10 @@ defmodule KyokoWeb.GameChannel do
     format_user(socket, user)
     |> Map.put(:selection, nil)
     |> Map.put(:emoji, nil)
+  end
+
+  defp send_presence_list(socket) do
+    push(socket, "presence_state", Presence.list(socket.assigns.room_code))
   end
 
   # Add authorization logic here as required.
