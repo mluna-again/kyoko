@@ -113,6 +113,20 @@ defmodule KyokoWeb.GameChannel do
   end
 
   @impl true
+  def handle_in("issues:new", payload, socket) do
+    broadcast(socket, "issues:new", payload)
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_in("issues:delete", payload, socket) do
+    broadcast(socket, "issues:delete", payload)
+
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_in("user:kick", %{"name" => user_name}, socket) do
     user = Rooms.get_user_by!(name: user_name, room_id: socket.assigns.room.id)
 
