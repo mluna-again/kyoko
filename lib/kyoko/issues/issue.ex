@@ -16,7 +16,7 @@ defmodule Kyoko.Issues.Issue do
   def changeset(issue, attrs) do
     issue
     |> cast(attrs, [:title, :description, :room_id])
-    |> validate_required([:title, :description, :room_id])
+    |> validate_required([:title, :room_id])
   end
 
   def create_changeset(issue, attrs, room) do
