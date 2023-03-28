@@ -113,6 +113,19 @@ defmodule KyokoWeb.GameChannel do
   end
 
   @impl true
+  def handle_in("issues:clearVote", payload, socket) do
+    broadcast(socket, "issues:clearVote", payload)
+
+    {:noreply, socket}
+  end
+
+  def handle_in("issues:setVote", payload, socket) do
+    broadcast(socket, "issues:setVote", payload)
+
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_in("issues:new", payload, socket) do
     broadcast(socket, "issues:new", payload)
 
