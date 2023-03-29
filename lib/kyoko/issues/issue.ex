@@ -3,11 +3,13 @@ defmodule Kyoko.Issues.Issue do
   import Ecto.Changeset
 
   alias Kyoko.Rooms.Room
+  alias Kyoko.Issues.IssueResponse
 
   schema "issues" do
     field :description, :string
     field :title, :string
     belongs_to :room, Room
+    has_many :responses, IssueResponse
 
     timestamps()
   end
