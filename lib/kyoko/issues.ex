@@ -6,7 +6,7 @@ defmodule Kyoko.Issues do
   import Ecto.Query, warn: false
   alias Kyoko.Repo
 
-  alias Kyoko.Issues.Issue
+  alias Kyoko.Issues.{Issue, IssueResponse}
   alias Kyoko.Rooms.Room
 
   @doc """
@@ -109,5 +109,30 @@ defmodule Kyoko.Issues do
   """
   def change_issue(%Issue{} = issue, attrs \\ %{}) do
     Issue.changeset(issue, attrs)
+  end
+
+  def add_responses_to_issue!(issue, users) do
+    issue_id = Map.get(issue, :id) || Map.get(issue, "id")
+
+    responses =
+      users
+      |> Enum.map(fn user ->
+        issue = %{
+          issue_id: issue_id,
+          user_id: Map.get(user, :id) || Map.get(user, "id"),
+          selection: Map.get(user, :selection) || Map.get(user, "selection")
+        }
+
+        %{valid?: true} = IssueResponse.changeset(%IssueResponse{}, issue)
+
+        issue
+      end)
+
+    # delete old responses if this method is called again
+    IssueResponse
+    |> where([response], response.issue_id == ^issue_id)
+    |> Repo.delete_all()
+
+    Repo.insert_all(IssueResponse, responses)
   end
 end

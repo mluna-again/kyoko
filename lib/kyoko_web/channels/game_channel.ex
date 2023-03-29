@@ -3,7 +3,7 @@ defmodule KyokoWeb.GameChannel do
 
   use KyokoWeb, :channel
   alias KyokoWeb.Presence
-  alias Kyoko.Rooms
+  alias Kyoko.{Rooms, Issues}
   alias Kyoko.PubSub
   alias KyokoWeb.RoomView
 
@@ -64,10 +64,13 @@ defmodule KyokoWeb.GameChannel do
 
   @impl true
   def handle_in("reveal_cards", _payload, socket) do
-    {:ok, _room} =
+    {:ok, room} =
       Rooms.get_room_by!(code: socket.assigns.room_code)
       |> Rooms.update_room(%{status: "game_over"})
 
+    if issue = Map.get(socket.assigns, :issue_being_voted) do
+      Issues.add_responses_to_issue!(issue, room.users)
+    end
     broadcast(socket, "reveal_cards", %{})
     {:noreply, socket}
   end
@@ -116,12 +119,14 @@ defmodule KyokoWeb.GameChannel do
   def handle_in("issues:clearVote", payload, socket) do
     broadcast(socket, "issues:clearVote", payload)
 
+    socket = assign(socket, :issue_being_voted, nil)
     {:noreply, socket}
   end
 
   def handle_in("issues:setVote", payload, socket) do
     broadcast(socket, "issues:setVote", payload)
 
+    socket = assign(socket, :issue_being_voted, payload)
     {:noreply, socket}
   end
 
