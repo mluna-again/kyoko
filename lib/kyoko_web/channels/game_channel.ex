@@ -71,6 +71,7 @@ defmodule KyokoWeb.GameChannel do
     if issue = Map.get(socket.assigns, :issue_being_voted) do
       Issues.add_responses_to_issue!(issue, room.users)
     end
+
     broadcast(socket, "reveal_cards", %{})
     {:noreply, socket}
   end
