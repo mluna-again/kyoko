@@ -14,18 +14,20 @@ defmodule Kyoko.Rooms.Room do
     field :rating_type, :string, default: "shirts"
     has_many :users, Kyoko.Rooms.User
     has_one :settings, Kyoko.Rooms.Settings
+    belongs_to :issue_being_voted, Kyoko.Issues.Issue
 
     timestamps()
   end
 
   defp _changeset(room, attrs) do
     room
-    |> cast(attrs, [:name, :active, :teams_enabled, :status, :rating_type])
+    |> cast(attrs, [:name, :active, :teams_enabled, :status, :rating_type, :issue_being_voted_id])
     |> validate_required([:name])
     |> validate_length(:name, max: 30)
     |> unique_constraint(:code)
     |> validate_inclusion(:status, @valid_states)
     |> validate_inclusion(:rating_type, @valid_rating_types)
+    |> foreign_key_constraint(:issue_being_voted_id)
   end
 
   @doc false

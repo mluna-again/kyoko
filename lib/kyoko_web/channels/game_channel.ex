@@ -127,6 +127,10 @@ defmodule KyokoWeb.GameChannel do
   def handle_in("issues:setVote", payload, socket) do
     broadcast(socket, "issues:setVote", payload)
 
+    {:ok, _room} =
+      Rooms.get_room_by!(code: socket.assigns.room_code)
+      |> Rooms.update_room(%{issue_being_voted_id: payload["id"]})
+
     socket = assign(socket, :issue_being_voted, payload)
     {:noreply, socket}
   end
