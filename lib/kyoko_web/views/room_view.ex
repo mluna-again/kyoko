@@ -19,7 +19,8 @@ defmodule KyokoWeb.RoomView do
       settings: render_one(room.settings, __MODULE__, "settings.json", as: :settings),
       status: room.status,
       teams_enabled: room.teams_enabled,
-      rating_type: room.rating_type
+      rating_type: room.rating_type,
+      issue_being_voted: issue_being_voted(room.issue_being_voted)
     }
   end
 
@@ -32,6 +33,17 @@ defmodule KyokoWeb.RoomView do
       clock: settings.clock,
       animation: settings.animation,
       emojis: settings.emojis
+    }
+  end
+
+  defp issue_being_voted(%Ecto.Association.NotLoaded{}), do: nil
+  defp issue_being_voted(nil), do: nil
+
+  defp issue_being_voted(issue) do
+    %{
+      id: issue.id,
+      title: issue.title,
+      description: issue.description
     }
   end
 end

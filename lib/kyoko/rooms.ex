@@ -164,7 +164,9 @@ defmodule Kyoko.Rooms do
 
   """
   def get_room!(id), do: Repo.get!(Room, id) |> Repo.preload([:users, :settings])
-  def get_room_by!(params), do: Repo.get_by!(Room, params) |> Repo.preload([:users, :settings])
+
+  def get_room_by!(params),
+    do: Repo.get_by!(Room, params) |> Repo.preload([:users, :settings, :issue_being_voted])
 
   @doc """
   Creates a room.
