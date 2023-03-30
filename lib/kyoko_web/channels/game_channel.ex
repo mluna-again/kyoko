@@ -68,12 +68,14 @@ defmodule KyokoWeb.GameChannel do
       Rooms.get_room_by!(code: socket.assigns.room_code)
       |> Rooms.update_room(%{status: "game_over"})
 
-    if room.issue_being_voted_id do
-      issue = room.issue_being_voted
-      Issues.add_responses_to_issue!(issue, room.users)
-    end
+    result =
+      if room.issue_being_voted_id do
+        issue = room.issue_being_voted
+        Issues.add_responses_to_issue!(issue, room.users)
+      end
 
     broadcast(socket, "reveal_cards", %{})
+    broadcast(socket, "issues:new_result", %{result: result, issue_id: room.issue_being_voted_id})
     {:noreply, socket}
   end
 

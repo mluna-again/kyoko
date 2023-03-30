@@ -148,5 +148,7 @@ defmodule Kyoko.Issues do
 
     Issue.changeset(issue, %{result: average})
     |> Repo.update!()
+
+    average
   end
 end
