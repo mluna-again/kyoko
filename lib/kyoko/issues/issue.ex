@@ -8,6 +8,7 @@ defmodule Kyoko.Issues.Issue do
   schema "issues" do
     field :description, :string
     field :title, :string
+    field :result, :integer
     belongs_to :room, Room
     has_many :responses, IssueResponse
 
@@ -17,7 +18,7 @@ defmodule Kyoko.Issues.Issue do
   @doc false
   def changeset(issue, attrs) do
     issue
-    |> cast(attrs, [:title, :description, :room_id])
+    |> cast(attrs, [:title, :description, :room_id, :result])
     |> validate_required([:title, :room_id])
   end
 

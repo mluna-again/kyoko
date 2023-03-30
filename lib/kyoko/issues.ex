@@ -116,11 +116,12 @@ defmodule Kyoko.Issues do
 
     responses =
       users
+      |> Stream.filter(fn user -> user.selection end)
       |> Enum.map(fn user ->
         issue = %{
           issue_id: issue_id,
-          user_id: Map.get(user, :id) || Map.get(user, "id"),
-          selection: Map.get(user, :selection) || Map.get(user, "selection")
+          user_id: user.id,
+          selection: user.selection
         }
 
         %{valid?: true} = IssueResponse.changeset(%IssueResponse{}, issue)
@@ -134,5 +135,18 @@ defmodule Kyoko.Issues do
     |> Repo.delete_all()
 
     Repo.insert_all(IssueResponse, responses)
+
+    calculate_average_from_responses!(issue, responses)
+  end
+
+  defp calculate_average_from_responses!(issue, responses) do
+    sum =
+      Stream.map(responses, fn response -> response.selection end)
+      |> Enum.sum()
+
+    average = round(sum / Enum.count(responses))
+
+    Issue.changeset(issue, %{result: average})
+    |> Repo.update!()
   end
 end

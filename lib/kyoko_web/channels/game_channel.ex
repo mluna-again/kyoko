@@ -68,7 +68,8 @@ defmodule KyokoWeb.GameChannel do
       Rooms.get_room_by!(code: socket.assigns.room_code)
       |> Rooms.update_room(%{status: "game_over"})
 
-    if issue = Map.get(socket.assigns, :issue_being_voted) do
+    if room.issue_being_voted_id do
+      issue = room.issue_being_voted
       Issues.add_responses_to_issue!(issue, room.users)
     end
 

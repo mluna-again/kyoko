@@ -14,7 +14,8 @@ defmodule KyokoWeb.IssueView do
     %{
       id: issue.id,
       title: issue.title,
-      description: issue.description
+      description: issue.description,
+      result: issue.result
     }
   end
 end
