@@ -5,6 +5,10 @@ defmodule KyokoWeb.Router do
     plug :accepts, ["json"]
   end
 
+  scope "/", KyokoWeb do
+    get "/ping", PingController, :pong
+  end
+
   scope "/api", KyokoWeb do
     pipe_through :api
 
