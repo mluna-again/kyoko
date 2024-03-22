@@ -48,7 +48,19 @@ defmodule KyokoWeb.GameChannel do
         Issues.add_responses_to_issue!(issue, room.users)
       end
 
-    broadcast(socket, "reveal_cards", %{})
+    broadcast(socket, "reveal_cards", %{
+      users: Enum.map(room.users, fn u -> format_user_with_selection(socket, u) end)
+    })
+
+    for user <- room.users do
+      Presence.update(
+        self(),
+        socket.assigns.room_code,
+        user.name,
+        format_user_with_selection(socket, user)
+      )
+    end
+
     broadcast(socket, "issues:new_result", %{result: result, issue_id: room.issue_being_voted_id})
     {:noreply, socket}
   end
@@ -206,6 +218,17 @@ defmodule KyokoWeb.GameChannel do
         online_at: inspect(System.system_time(:second)),
         name: socket.assigns.player_name,
         selection: not is_nil(user.selection)
+      },
+      RoomView.render("user.json", %{user: user})
+    )
+  end
+
+  defp format_user_with_selection(socket, user) do
+    Map.merge(
+      %{
+        online_at: inspect(System.system_time(:second)),
+        name: socket.assigns.player_name,
+        selection: user.selection
       },
       RoomView.render("user.json", %{user: user})
     )

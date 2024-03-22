@@ -5,13 +5,25 @@ defmodule KyokoWeb.RoomController do
   alias Kyoko.Rooms.Room
   alias Kyoko.Rooms.User
   alias Kyoko.Rooms.Settings
+  alias KyokoWeb.Endpoint
 
   action_fallback KyokoWeb.FallbackController
 
   plug :check_for_rooms_available
 
-  def selection(conn, %{"id" => id, "selection" => selection}) do
+  def selection(conn, %{"id" => id, "selection" => selection, "emoji" => emoji, "player" => player}) do
+    user = Rooms.get_user_by_room!(id, player)
+    selection = if user.selection == selection, do: nil, else: selection
 
+    {:ok, user} = Rooms.update_user(user, %{selection: selection, emoji: emoji})
+
+    Endpoint.broadcast("room_presence:#{id}", "update_user", %{
+      player: player,
+      selection: not is_nil(user.selection)
+    })
+
+    conn
+    |> send_resp(:no_content, "")
   end
 
   def create(conn, %{"room" => %{"first" => first_user} = room}) do
