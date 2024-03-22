@@ -48,18 +48,9 @@ defmodule KyokoWeb.GameChannel do
         Issues.add_responses_to_issue!(issue, room.users)
       end
 
-    broadcast(socket, "reveal_cards", %{
-      users: Enum.map(room.users, fn u -> format_user_with_selection(socket, u) end)
-    })
-
-    for user <- room.users do
-      Presence.update(
-        self(),
-        socket.assigns.room_code,
-        user.name,
-        format_user_with_selection(socket, user)
-      )
-    end
+    users_with_selection = Enum.map(room.users, fn u -> format_user_with_selection(socket, u) end)
+    broadcast(socket, "reveal_cards", %{users: users_with_selection})
+    broadcast(socket, "users:update_selections", %{users: users_with_selection})
 
     broadcast(socket, "issues:new_result", %{result: result, issue_id: room.issue_being_voted_id})
     {:noreply, socket}
