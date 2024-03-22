@@ -37,32 +37,6 @@ defmodule KyokoWeb.GameChannel do
   end
 
   @impl true
-  def handle_in(
-        "user_selection",
-        %{"player" => name, "selection" => selection, "emoji" => emoji} = payload,
-        socket
-      ) do
-    {:ok, user} =
-      Rooms.get_user_by_room!(socket.assigns.room_code, name)
-      |> Rooms.update_user(%{selection: selection})
-
-    Presence.update(
-      self(),
-      socket.assigns.room_code,
-      socket.assigns.player_name,
-      Map.put(format_user(socket, user), :emoji, emoji)
-    )
-
-    broadcast(socket, "user_selection", payload)
-    {:noreply, socket}
-  end
-
-  @impl true
-  def handle_in("user_selection", %{"player" => _name} = payload, socket) do
-    handle_in("user_selection", Map.merge(payload, %{"selection" => nil}), socket)
-  end
-
-  @impl true
   def handle_in("reveal_cards", _payload, socket) do
     {:ok, room} =
       Rooms.get_room_by!(code: socket.assigns.room_code)
@@ -196,6 +170,7 @@ defmodule KyokoWeb.GameChannel do
       )
 
     Phoenix.PubSub.subscribe(PubSub, socket.assigns.room_code)
+    KyokoWeb.Endpoint.subscribe("room_presence:" <> socket.assigns.room_code)
 
     send_presence_list(socket)
 
@@ -204,6 +179,20 @@ defmodule KyokoWeb.GameChannel do
       |> assign(:room, room)
 
     {:noreply, assign(socket, :whole_user, user)}
+  end
+
+  def handle_info(%{topic: "room_presence:" <> _, event: "update_user", payload: meta}, socket) do
+    %{} = user = Rooms.get_user_by_room!(socket.assigns.room_code, meta.player)
+
+    Presence.update(
+      self(),
+      socket.assigns.room_code,
+      user.name,
+      format_user(socket, user)
+    )
+
+    broadcast(socket, "user_selection", meta)
+    {:noreply, socket}
   end
 
   def handle_info(%{event: "presence_diff", payload: payload}, socket) do
@@ -216,7 +205,7 @@ defmodule KyokoWeb.GameChannel do
       %{
         online_at: inspect(System.system_time(:second)),
         name: socket.assigns.player_name,
-        selection: user.selection
+        selection: not is_nil(user.selection)
       },
       RoomView.render("user.json", %{user: user})
     )

@@ -8,7 +8,11 @@ defmodule KyokoWeb.RoomController do
 
   action_fallback KyokoWeb.FallbackController
 
-  plug :check_for_rooms_available when action in [:create]
+  plug :check_for_rooms_available
+
+  def selection(conn, %{"id" => id, "selection" => selection}) do
+
+  end
 
   def create(conn, %{"room" => %{"first" => first_user} = room}) do
     with {:ok, %Room{} = room} <- Rooms.create_room(room),

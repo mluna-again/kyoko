@@ -13,6 +13,7 @@ defmodule KyokoWeb.Router do
     pipe_through :api
 
     resources "/rooms", RoomController, only: ~w(create show update)a
+    patch "/rooms/:id/selection", RoomController, :selection
     resources "/issues", IssueController, except: [:new, :edit, :show]
     get "/issues/:room_code", IssueController, :index_by_room
     patch "/users/:user", UserController, :update
