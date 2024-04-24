@@ -11,7 +11,20 @@ defmodule KyokoWeb.RoomController do
 
   plug :check_for_rooms_available
 
-  def selection(conn, %{"id" => id, "selection" => selection, "emoji" => emoji, "player" => player}) do
+  def all_selected(conn, %{"id" => id}) do
+    if Rooms.everyone_selected?(id) do
+      json(conn, %{ok: true})
+    else
+      json(conn, %{ok: false})
+    end
+  end
+
+  def selection(conn, %{
+        "id" => id,
+        "selection" => selection,
+        "emoji" => emoji,
+        "player" => player
+      }) do
     user = Rooms.get_user_by_room!(id, player)
     selection = if user.selection == selection, do: nil, else: selection
 

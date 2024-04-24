@@ -10,6 +10,18 @@ defmodule Kyoko.Rooms do
   alias Kyoko.Rooms.User
   alias Kyoko.Rooms.Settings
 
+  def everyone_selected?(room_code) do
+    users_without_selection =
+      Room
+      |> where([r], r.code == ^room_code)
+      |> join(:inner, [r], user in User,
+        on: user.room_id == r.id and user.active and is_nil(user.selection)
+      )
+      |> Repo.exists?()
+
+    !users_without_selection
+  end
+
   def update_emojis!(room_code, emojis) do
     room = Repo.preload(get_room_by!(code: room_code), [:settings])
 
